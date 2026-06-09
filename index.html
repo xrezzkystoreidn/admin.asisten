@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XREZZKY · Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#070c14;--navy2:#0c1220;--card:#111d2e;--card2:#142035;
+  --border:rgba(37,99,235,.18);--border2:rgba(255,255,255,.06);
+  --accent:#2563eb;--accent-lo:rgba(37,99,235,.12);
+  --cyan:#38bdf8;--green:#22c55e;--gold:#f59e0b;--red:#ef4444;--purple:#a78bfa;
+  --text:#f0f4ff;--text-sub:#8fa3c0;--text-muted:#3d5270;
+  --radius:14px;--radius-sm:8px;--shadow:0 4px 24px rgba(0,0,0,.5);
+}
+html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;background:var(--navy);color:var(--text);font-size:14px}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+button{cursor:pointer;font-family:inherit}
+input,select{font-family:inherit}
+
+/* ── LOGIN GATE ─────────────────────────────────── */
+#loginGate{position:fixed;inset:0;z-index:999;background:var(--navy);display:flex;align-items:center;justify-content:center}
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:44px 40px;width:100%;max-width:380px;text-align:center;box-shadow:0 0 60px rgba(37,99,235,.15)}
+.login-logo{width:60px;height:60px;border-radius:16px;margin:0 auto 20px;background:linear-gradient(135deg,#1d4ed8,#2563eb);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;box-shadow:0 0 24px rgba(37,99,235,.4)}
+.login-card h2{font-size:20px;font-weight:800;margin-bottom:4px}
+.login-card p{font-size:12px;color:var(--text-sub);margin-bottom:28px}
+.google-btn{width:100%;padding:13px;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
+.google-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(37,99,235,.5)}
+.google-btn img{width:20px;height:20px}
+#loginErr{margin-top:14px;font-size:12px;color:var(--red);background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:var(--radius-sm);padding:8px 12px;display:none}
+
+/* ── APP LAYOUT ─────────────────────────────────── */
+#app{display:none;min-height:100vh}
+#app.ready{display:flex}
+.sidebar{width:240px;min-height:100vh;background:var(--navy2);border-right:1px solid var(--border2);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.main{flex:1;overflow-x:hidden;min-width:0;display:flex;flex-direction:column}
+
+/* ── SIDEBAR ────────────────────────────────────── */
+.sb-brand{padding:18px 16px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px}
+.sb-logo{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,#1d4ed8,#2563eb);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;box-shadow:0 0 14px rgba(37,99,235,.4)}
+.sb-brand h3{font-size:13px;font-weight:800}
+.sb-brand p{font-size:10px;color:var(--text-muted)}
+.sb-admin{margin:12px 10px 0;padding:10px 12px;background:var(--accent-lo);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;gap:9px}
+.sb-ava{width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.sb-ava img{width:100%;height:100%;object-fit:cover}
+.sb-an{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-ar{font-size:9px;color:var(--gold);font-weight:700;display:flex;align-items:center;gap:3px;margin-top:1px}
+.sb-nav{flex:1;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.nav-sec{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--text-muted);text-transform:uppercase;padding:10px 6px 4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:500;color:var(--text-sub);border:1px solid transparent;transition:all .15s;cursor:pointer}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.nav-item.active{background:var(--accent-lo);border-color:var(--border);color:var(--text)}
+.nav-item.active i,.nav-item:hover i{color:var(--accent)}
+.nav-item i{width:16px;text-align:center;font-size:12px;color:var(--text-muted);transition:color .15s}
+.sb-foot{padding:12px 10px;border-top:1px solid var(--border2)}
+.logout-btn{width:100%;padding:9px 12px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius-sm);color:var(--red);font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;justify-content:center;transition:all .15s}
+.logout-btn:hover{background:rgba(239,68,68,.15)}
+
+/* ── TOPBAR ─────────────────────────────────────── */
+.topbar{height:56px;background:var(--navy2);border-bottom:1px solid var(--border2);padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:10}
+.topbar h2{font-size:15px;font-weight:800}
+.topbar p{font-size:11px;color:var(--text-sub);margin-top:1px}
+.live-badge{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);font-size:11px;color:var(--green);font-weight:600}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── PAGES ──────────────────────────────────────── */
+.page{display:none;padding:22px;flex-direction:column;gap:18px}
+.page.active{display:flex}
+
+/* ── STAT CARDS ─────────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.sc{background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden;transition:border-color .2s}
+.sc:hover{border-color:rgba(37,99,235,.35)}
+.sc-glow{position:absolute;right:-10px;top:-10px;width:80px;height:80px;border-radius:50%;filter:blur(40px);opacity:.07;pointer-events:none}
+.sc-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:12px}
+.sc-icon.blue{background:rgba(37,99,235,.15);color:var(--accent)}
+.sc-icon.cyan{background:rgba(56,189,248,.12);color:var(--cyan)}
+.sc-icon.green{background:rgba(34,197,94,.12);color:var(--green)}
+.sc-icon.gold{background:rgba(245,158,11,.12);color:var(--gold)}
+.sc-icon.purple{background:rgba(167,139,250,.12);color:var(--purple)}
+.sc-icon.red{background:rgba(239,68,68,.12);color:var(--red)}
+.sc-val{font-size:26px;font-weight:800;line-height:1;margin-bottom:3px}
+.sc-label{font-size:11px;color:var(--text-sub);font-weight:500}
+.sc-sub{font-size:10px;color:var(--text-muted);margin-top:3px}
+
+/* ── PANELS ─────────────────────────────────────── */
+.panel{background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden}
+.panel-head{padding:13px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.panel-head h4{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.panel-head h4 i{color:var(--accent);font-size:12px}
+.panel-body{padding:16px 18px}
+
+/* ── TABLES ─────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead th{padding:9px 13px;text-align:left;font-size:9.5px;font-weight:700;letter-spacing:.08em;color:var(--text-muted);text-transform:uppercase;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border2);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border2);transition:background .12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+tbody td{padding:10px 13px;font-size:12.5px;vertical-align:middle}
+.tbl-empty{text-align:center;padding:36px;color:var(--text-muted);font-size:13px}
+.spinner{width:26px;height:26px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── BADGES ─────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em;white-space:nowrap;border:1px solid}
+.badge.ADMIN  {background:rgba(245,158,11,.15);color:var(--gold);border-color:rgba(245,158,11,.25)}
+.badge.SELLER {background:rgba(56,189,248,.12);color:var(--cyan);border-color:rgba(56,189,248,.2)}
+.badge.MEMBER {background:rgba(34,197,94,.12);color:var(--green);border-color:rgba(34,197,94,.2)}
+.badge.GUEST  {background:rgba(255,255,255,.05);color:var(--text-sub);border-color:var(--border2)}
+.badge.BANNED {background:rgba(239,68,68,.12);color:var(--red);border-color:rgba(239,68,68,.25)}
+.badge.STOPPED{background:rgba(245,158,11,.1);color:var(--gold);border-color:rgba(245,158,11,.2)}
+
+/* ── FORM ELEMENTS ──────────────────────────────── */
+.tbl-select{padding:5px 8px;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:12px;outline:none;cursor:pointer;transition:border-color .15s}
+.tbl-select:focus{border-color:rgba(37,99,235,.5)}
+.tbl-select option{background:#111d2e;color:var(--text)}
+.tbl-inp{width:72px;padding:5px 8px;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:12px;text-align:center;outline:none;transition:border-color .15s}
+.tbl-inp:focus{border-color:rgba(37,99,235,.5)}
+.tbl-inp:disabled{opacity:.4;cursor:not-allowed}
+.field-inp{width:100%;padding:9px 13px;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none;transition:border-color .15s}
+.field-inp:focus{border-color:rgba(37,99,235,.5)}
+.field-inp[type=number]{width:140px}
+
+/* ── BUTTONS ────────────────────────────────────── */
+.act{padding:5px 11px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.act.pri {background:rgba(37,99,235,.15);border-color:rgba(37,99,235,.4);color:var(--accent)}
+.act.pri:hover{background:rgba(37,99,235,.28)}
+.act.red {background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:var(--red)}
+.act.red:hover{background:rgba(239,68,68,.2)}
+.act.grn {background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:var(--green)}
+.act.grn:hover{background:rgba(34,197,94,.2)}
+.act.yel {background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:var(--gold)}
+.act.yel:hover{background:rgba(245,158,11,.2)}
+.act.pur {background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.3);color:var(--purple)}
+.act.pur:hover{background:rgba(167,139,250,.2)}
+.act.cyn {background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.25);color:var(--cyan)}
+.act.cyn:hover{background:rgba(56,189,248,.18)}
+.save-btn{padding:10px 20px;background:var(--accent);border:none;border-radius:var(--radius-sm);color:#fff;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:7px;transition:opacity .15s;margin-top:14px}
+.save-btn:hover{opacity:.88}
+.act-grp{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+
+/* ── FILTER BAR ─────────────────────────────────── */
+.filter-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.search-wrap{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 12px;flex:1;min-width:160px}
+.search-wrap i{color:var(--text-muted);font-size:12px;flex-shrink:0}
+.search-wrap input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%}
+.search-wrap input::placeholder{color:var(--text-muted)}
+.filter-sel{padding:7px 11px;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:12px;outline:none;cursor:pointer}
+.filter-sel option{background:#111d2e}
+
+/* ── USER CELL ──────────────────────────────────── */
+.u-cell{display:flex;align-items:center;gap:9px}
+.u-ava{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.u-name{font-size:12.5px;font-weight:600;line-height:1.3}
+.u-email{font-size:10px;color:var(--text-sub)}
+
+/* ── SETTINGS ───────────────────────────────────── */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:640px){.settings-grid{grid-template-columns:1fr}}
+.s-item{display:flex;flex-direction:column;gap:5px}
+.s-label{font-size:10px;font-weight:700;color:var(--text-sub);text-transform:uppercase;letter-spacing:.06em}
+.s-desc{font-size:11px;color:var(--text-muted)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--border2)}
+.toggle-row:last-of-type{border-bottom:none;padding-bottom:0}
+.toggle-info strong{font-size:13px;font-weight:600;display:block;margin-bottom:3px}
+.toggle-info span{font-size:11px;color:var(--text-sub)}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:24px;cursor:pointer;transition:background .2s;border:1px solid var(--border2)}
+.toggle-track::after{content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s}
+.toggle input:checked ~ .toggle-track{background:var(--accent);border-color:var(--accent)}
+.toggle input:checked ~ .toggle-track::after{transform:translateX(20px)}
+.role-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.role-card{background:rgba(255,255,255,.02);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:13px 15px}
+.role-card-head{display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.rlc-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+.rlc-lbl{font-size:11px;color:var(--text-sub)}
+.rlc-inp{width:78px;padding:5px 8px;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:12px;text-align:center;outline:none;transition:border-color .15s}
+.rlc-inp:focus{border-color:rgba(37,99,235,.5)}
+.rlc-note{font-size:10px;color:var(--text-muted);font-style:italic}
+.info-box{padding:13px 16px;border-radius:var(--radius-sm);font-size:12px;line-height:1.65;display:flex;align-items:flex-start;gap:10px}
+.info-box.blue{background:rgba(37,99,235,.07);border:1px solid rgba(37,99,235,.2);color:var(--text-sub)}
+.info-box.gold{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);color:var(--text-sub)}
+.info-box i{flex-shrink:0;margin-top:1px}
+
+/* ── TOAST ──────────────────────────────────────── */
+#toasts{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{padding:11px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;border:1px solid;pointer-events:auto;animation:tIn .25s ease;display:flex;align-items:center;gap:8px;max-width:300px}
+.toast.ok {background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.35);color:var(--green)}
+.toast.err{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.35);color:var(--red)}
+.toast.inf{background:rgba(37,99,235,.1);border-color:rgba(37,99,235,.35);color:var(--cyan)}
+@keyframes tIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CONFIRM MODAL ──────────────────────────────── */
+#cfm{position:fixed;inset:0;z-index:998;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px}
+#cfm.open{display:flex}
+.cfm-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px 28px;max-width:340px;width:100%;text-align:center;box-shadow:var(--shadow)}
+.cfm-card .ci{font-size:38px;margin-bottom:12px}
+.cfm-card h4{font-size:16px;font-weight:800;margin-bottom:7px}
+.cfm-card p{font-size:12px;color:var(--text-sub);line-height:1.65;margin-bottom:20px}
+.cfm-btns{display:flex;gap:10px;justify-content:center}
+.cfm-btns button{flex:1;padding:10px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;border:1px solid;transition:all .15s}
+#cfmOk{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:var(--red)}
+#cfmOk:hover{background:rgba(239,68,68,.28)}
+#cfmNo{background:rgba(255,255,255,.04);border-color:var(--border2);color:var(--text-sub)}
+#cfmNo:hover{background:rgba(255,255,255,.08)}
+
+/* ── USER DETAIL MODAL ──────────────────────────── */
+#udModal{position:fixed;inset:0;z-index:997;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto}
+#udModal.open{display:flex}
+.ud-card{background:var(--card);border:1px solid var(--border);border-radius:20px;width:100%;max-width:520px;box-shadow:0 0 50px rgba(37,99,235,.12);overflow:hidden;margin:auto}
+.ud-head{padding:20px 22px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,rgba(37,99,235,.07),transparent)}
+.ud-ava{width:48px;height:48px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff}
+.ud-body{padding:18px 22px;display:flex;flex-direction:column;gap:14px}
+.ud-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ud-field{background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:9px 12px}
+.ud-fl{font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--text-muted);text-transform:uppercase;margin-bottom:3px}
+.ud-fv{font-size:13px;font-weight:600;color:var(--text);word-break:break-all}
+.ud-sec{font-size:11px;font-weight:700;color:var(--text-sub);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:6px}
+.ud-sec i{color:var(--accent)}
+.ud-foot{display:flex;gap:8px;flex-wrap:wrap;padding:14px 22px;border-top:1px solid var(--border2)}
+.ud-act{flex:1;min-width:110px;padding:10px;border-radius:var(--radius-sm);font-size:12px;font-weight:700;border:1px solid;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
+
+/* ── RESPONSIVE ─────────────────────────────────── */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .topbar{padding:0 14px}
+  .page{padding:14px}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  tbody td{padding:8px 9px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN GATE -->
+<div id="loginGate">
+  <div class="login-card">
+    <div class="login-logo">X</div>
+    <h2>Admin Dashboard</h2>
+    <p>Masuk dengan akun Google Admin untuk melanjutkan.</p>
+    <button class="google-btn" onclick="doLogin()">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
+      Masuk dengan Google
+    </button>
+    <div id="loginErr"></div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div id="cfm">
+  <div class="cfm-card">
+    <div class="ci" id="cfmIcon">⚠️</div>
+    <h4 id="cfmTitle">Konfirmasi</h4>
+    <p id="cfmMsg">Lanjutkan?</p>
+    <div class="cfm-btns">
+      <button id="cfmOk">Ya, Lanjutkan</button>
+      <button id="cfmNo">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- USER DETAIL MODAL -->
+<div id="udModal" onclick="if(event.target===this)closeUD()">
+  <div class="ud-card">
+    <div class="ud-head">
+      <div class="ud-ava" id="ud-ava">?</div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:800" id="ud-name">—</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+          <span class="badge MEMBER" id="ud-role">—</span>
+          <span style="font-size:11px;color:var(--text-muted)" id="ud-email">—</span>
+        </div>
+      </div>
+      <button onclick="closeUD()" style="background:rgba(255,255,255,.07);border:1px solid var(--border2);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--text-sub);font-size:13px;transition:all .15s" onmouseover="this.style.background='rgba(239,68,68,.15)';this.style.color='var(--red)'" onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.color='var(--text-sub)'">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="ud-body">
+      <div>
+        <div class="ud-sec" style="margin-bottom:9px"><i class="fa-solid fa-id-card"></i> Informasi Akun</div>
+        <div class="ud-grid">
+          <div class="ud-field" style="grid-column:1/-1">
+            <div class="ud-fl">UID Firebase</div>
+            <div class="ud-fv" id="ud-uid" style="font-size:10px;font-family:monospace">—</div>
+          </div>
+          <div class="ud-field"><div class="ud-fl">IP Address</div><div class="ud-fv" id="ud-ip" style="font-family:monospace;font-size:11px">—</div></div>
+          <div class="ud-field"><div class="ud-fl">Bergabung</div><div class="ud-fv" id="ud-since" style="font-size:11px">—</div></div>
+          <div class="ud-field"><div class="ud-fl">Terakhir Aktif</div><div class="ud-fv" id="ud-last" style="font-size:11px">—</div></div>
+          <div class="ud-field"><div class="ud-fl">Limit Chat/hari</div><div class="ud-fv" id="ud-clim" style="color:var(--cyan)">—</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="ud-sec" style="margin-bottom:9px"><i class="fa-solid fa-chart-bar"></i> Statistik Global</div>
+        <div class="ud-grid">
+          <div class="ud-field" style="border-color:rgba(37,99,235,.3)"><div class="ud-fl">Total Chat</div><div class="ud-fv" id="ud-chats" style="font-size:22px;color:var(--cyan)">—</div></div>
+          <div class="ud-field" style="border-color:rgba(34,197,94,.2)"><div class="ud-fl">Total Foto</div><div class="ud-fv" id="ud-photos" style="font-size:22px;color:var(--green)">—</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="ud-sec" style="margin-bottom:9px"><i class="fa-solid fa-chart-column"></i> Aktivitas 7 Hari Terakhir</div>
+        <div id="ud-chart" style="background:rgba(255,255,255,.02);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:13px;min-height:100px;display:flex;align-items:center;justify-content:center">
+          <div class="spinner"></div>
+        </div>
+      </div>
+      <div>
+        <div class="ud-sec" style="margin-bottom:9px"><i class="fa-solid fa-comments"></i> Sesi Terakhir</div>
+        <div id="ud-sessions" style="display:flex;flex-direction:column;gap:5px">
+          <div style="color:var(--text-muted);font-size:12px;text-align:center;padding:8px">Memuat...</div>
+        </div>
+      </div>
+    </div>
+    <div class="ud-foot">
+      <button class="ud-act cyn" onclick="doResetQuota(document.getElementById('ud-uid').textContent, document.getElementById('ud-name').textContent)">
+        <i class="fa-solid fa-rotate-right"></i> Reset Kuota
+      </button>
+      <button class="ud-act" style="background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:var(--red)"
+        onclick="closeUD();doBan(document.getElementById('ud-uid').textContent, document.getElementById('ud-name').textContent)">
+        <i class="fa-solid fa-ban"></i> Ban
+      </button>
+      <button class="ud-act" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.25);color:var(--gold)"
+        onclick="closeUD();doStop(document.getElementById('ud-uid').textContent, document.getElementById('ud-name').textContent)">
+        <i class="fa-solid fa-pause"></i> Stop
+      </button>
+      <button class="ud-act" style="background:rgba(255,255,255,.04);border-color:var(--border2);color:var(--text-sub)" onclick="closeUD()">
+        <i class="fa-solid fa-xmark"></i> Tutup
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div id="toasts"></div>
+
+<!-- APP -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">X</div>
+      <div><h3>XREZZKY AI</h3><p>Admin Panel</p></div>
+    </div>
+    <div class="sb-admin">
+      <div class="sb-ava" id="sbAva">A</div>
+      <div style="flex:1;overflow:hidden">
+        <div class="sb-an" id="sbName">Administrator</div>
+        <div class="sb-ar"><i class="fa-solid fa-crown" style="font-size:8px"></i> ADMIN</div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-sec">Overview</div>
+      <div class="nav-item active" data-page="dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</div>
+      <div class="nav-sec">Monitoring</div>
+      <div class="nav-item" data-page="analytics"><i class="fa-solid fa-chart-line"></i> Trafik & Analitik</div>
+      <div class="nav-item" data-page="users"><i class="fa-solid fa-users"></i> Manajemen User</div>
+      <div class="nav-sec">Konfigurasi</div>
+      <div class="nav-item" data-page="settings"><i class="fa-solid fa-sliders"></i> Pengaturan Sistem</div>
+    </nav>
+    <div class="sb-foot">
+      <button class="logout-btn" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div><h2 id="pgTitle">Dashboard</h2><p id="pgSub">Ringkasan sistem XREZZKY AI</p></div>
+      <div class="live-badge"><div class="live-dot"></div> Realtime</div>
+    </div>
+
+    <!-- ══ PAGE: DASHBOARD ══════════════════════════════ -->
+    <div class="page active" id="page-dashboard">
+      <div class="stat-grid">
+        <div class="sc">
+          <div class="sc-glow" style="background:var(--accent)"></div>
+          <div class="sc-icon blue"><i class="fa-solid fa-users"></i></div>
+          <div class="sc-val" id="s-users">—</div>
+          <div class="sc-label">Total User</div>
+          <div class="sc-sub" id="s-users-sub">Memuat...</div>
+        </div>
+        <div class="sc">
+          <div class="sc-glow" style="background:var(--cyan)"></div>
+          <div class="sc-icon cyan"><i class="fa-solid fa-message"></i></div>
+          <div class="sc-val" id="s-chats">—</div>
+          <div class="sc-label">Total Chat</div>
+          <div class="sc-sub">Akumulasi semua user</div>
+        </div>
+        <div class="sc">
+          <div class="sc-glow" style="background:var(--green)"></div>
+          <div class="sc-icon green"><i class="fa-solid fa-image"></i></div>
+          <div class="sc-val" id="s-photos">—</div>
+          <div class="sc-label">Total Foto</div>
+          <div class="sc-sub">Akumulasi semua user</div>
+        </div>
+        <div class="sc">
+          <div class="sc-glow" style="background:var(--gold)"></div>
+          <div class="sc-icon gold"><i class="fa-solid fa-camera"></i></div>
+          <div class="sc-val" id="s-gphoto">—</div>
+          <div class="sc-label">Foto Guest</div>
+          <div class="sc-sub" id="s-gphoto-sub">sistem_settings</div>
+        </div>
+        <div class="sc">
+          <div class="sc-glow" style="background:var(--red)"></div>
+          <div class="sc-icon red"><i class="fa-solid fa-ban"></i></div>
+          <div class="sc-val" id="s-banned">—</div>
+          <div class="sc-label">User Dibanned</div>
+          <div class="sc-sub">role = BANNED</div>
+        </div>
+        <div class="sc">
+          <div class="sc-glow" style="background:var(--purple)"></div>
+          <div class="sc-icon purple"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          <div class="sc-val" id="s-today">—</div>
+          <div class="sc-label">Aktif 24 Jam</div>
+          <div class="sc-sub">Kunjungan terakhir</div>
+        </div>
+      </div>
+
+      <!-- Top 5 -->
+      <div class="panel">
+        <div class="panel-head">
+          <h4><i class="fa-solid fa-trophy"></i> Top 5 User Teraktif</h4>
+          <span style="font-size:11px;color:var(--text-muted)">total chat terbanyak</span>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>User</th><th>Role</th><th>Total Chat</th><th>Total Foto</th><th>Terakhir Aktif</th><th></th></tr></thead>
+            <tbody id="topTbl"><tr><td colspan="7" class="tbl-empty"><div class="spinner"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: ANALYTICS ══════════════════════════════ -->
+    <div class="page" id="page-analytics">
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="anSearch" placeholder="Cari nama / email / IP..." oninput="renderAnalytics()">
+        </div>
+        <select class="filter-sel" id="anSort" onchange="renderAnalytics()">
+          <option value="total_chats_sent">Urutkan: Total Chat ↓</option>
+          <option value="total_photos_sent">Urutkan: Total Foto ↓</option>
+          <option value="last_visit">Urutkan: Terbaru ↓</option>
+        </select>
+        <button class="act pri" onclick="exportCSV('traffic')"><i class="fa-solid fa-download"></i> Export CSV</button>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <h4><i class="fa-solid fa-chart-line"></i> Log Trafik & Aktivitas</h4>
+          <span style="font-size:11px;color:var(--text-muted)" id="anCount">0 entri</span>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>User</th><th>Terakhir Kunjungan</th><th>Total Chat</th><th>Total Foto</th><th>IP Address</th><th>Role</th><th>Aksi</th></tr></thead>
+            <tbody id="anTbl"><tr><td colspan="7" class="tbl-empty"><div class="spinner"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: USERS ══════════════════════════════════ -->
+    <div class="page" id="page-users">
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="usrSearch" placeholder="Cari nama / email / UID..." oninput="renderUsers()">
+        </div>
+        <select class="filter-sel" id="usrRole" onchange="renderUsers()">
+          <option value="">Semua Role</option>
+          <option value="ADMIN">ADMIN</option>
+          <option value="SELLER">SELLER</option>
+          <option value="MEMBER">MEMBER</option>
+          <option value="GUEST">GUEST</option>
+          <option value="BANNED">BANNED</option>
+          <option value="STOPPED">STOPPED</option>
+        </select>
+        <button class="act pri" onclick="exportCSV('users')"><i class="fa-solid fa-download"></i> Export</button>
+        <button class="act yel" onclick="doResetAll()"><i class="fa-solid fa-rotate-right"></i> Reset Semua Kuota</button>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <h4><i class="fa-solid fa-users-gear"></i> Daftar Pengguna (Gmail)</h4>
+          <span style="font-size:11px;color:var(--text-muted)" id="usrCount">0 user</span>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>User (Gmail)</th><th>Role</th><th>Limit Chat</th><th>Limit Foto</th><th>Status</th><th>Aksi</th></tr></thead>
+            <tbody id="usrTbl"><tr><td colspan="6" class="tbl-empty"><div class="spinner"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: SETTINGS ═══════════════════════════════ -->
+    <div class="page" id="page-settings">
+
+      <!-- Login required info -->
+      <div class="info-box blue">
+        <i class="fa-solid fa-shield-halved" style="color:var(--accent)"></i>
+        <div>
+          <strong style="color:var(--text)">Login Wajib untuk Kirim Foto</strong><br>
+          Backend <code style="background:rgba(0,0,0,.3);padding:1px 5px;border-radius:4px;font-size:11px">api/chat.js</code>
+          sudah memvalidasi Bearer Token — hanya user yang login dengan Google yang bisa upload foto.
+          Toggle <em>Izinkan Guest Foto</em> di bawah bersifat sebagai lapisan tambahan.<br>
+          <span style="color:var(--gold)">💡 Agar Guest wajib login sebelum chat, set <strong>default_guest_chat_limit = 0</strong>.</span>
+        </div>
+      </div>
+
+      <!-- Global Toggles -->
+      <div class="panel">
+        <div class="panel-head"><h4><i class="fa-solid fa-toggle-on"></i> Kontrol Global</h4></div>
+        <div class="panel-body">
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <strong>Izinkan Guest Kirim Foto</strong>
+              <span>User tanpa login bisa upload gambar saat chat (jika backend juga mengizinkan)</span>
+            </div>
+            <label class="toggle"><input type="checkbox" id="tog-gphoto"><div class="toggle-track"></div></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <strong>Mode Maintenance</strong>
+              <span>Nonaktifkan semua interaksi chat untuk semua user sementara</span>
+            </div>
+            <label class="toggle"><input type="checkbox" id="tog-maint"><div class="toggle-track"></div></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <strong>Wajib Login untuk Chat</strong>
+              <span>Guest tidak bisa mengirim pesan sama sekali — harus login dahulu</span>
+            </div>
+            <label class="toggle"><input type="checkbox" id="tog-loginreq"><div class="toggle-track"></div></label>
+          </div>
+          <button class="save-btn" onclick="saveToggles()"><i class="fa-solid fa-floppy-disk"></i> Simpan Toggle</button>
+        </div>
+      </div>
+
+      <!-- Role Default Limits -->
+      <div class="panel">
+        <div class="panel-head">
+          <h4><i class="fa-solid fa-sliders"></i> Batas Default per Role</h4>
+          <span style="font-size:11px;color:var(--text-muted)">berlaku untuk user baru</span>
+        </div>
+        <div class="panel-body">
+          <div class="role-grid" id="roleGrid"><!-- JS --></div>
+          <div class="info-box gold" style="margin-top:12px">
+            <i class="fa-solid fa-crown" style="color:var(--gold)"></i>
+            <span>ADMIN tidak memiliki batasan — semua limit diabaikan di backend.</span>
+          </div>
+          <button class="save-btn" onclick="saveRoleLimits()"><i class="fa-solid fa-floppy-disk"></i> Simpan Limit Role</button>
+        </div>
+      </div>
+
+      <!-- Default new member limits -->
+      <div class="panel">
+        <div class="panel-head"><h4><i class="fa-solid fa-user-plus"></i> Default Limit Member & Guest Baru</h4></div>
+        <div class="panel-body">
+          <div class="settings-grid">
+            <div class="s-item">
+              <div class="s-label">Chat Limit — Member</div>
+              <input type="number" class="field-inp" id="def-mc" value="50" min="0" max="9999">
+              <div class="s-desc">Limit harian chat untuk member baru</div>
+            </div>
+            <div class="s-item">
+              <div class="s-label">Foto Limit — Member</div>
+              <input type="number" class="field-inp" id="def-mp" value="5" min="0" max="9999">
+              <div class="s-desc">Limit harian foto untuk member baru</div>
+            </div>
+            <div class="s-item">
+              <div class="s-label">Chat Limit — Guest</div>
+              <input type="number" class="field-inp" id="def-gc" value="10" min="0" max="999">
+              <div class="s-desc">0 = wajib login untuk chat</div>
+            </div>
+            <div class="s-item">
+              <div class="s-label">Foto Limit — Guest</div>
+              <input type="number" class="field-inp" id="def-gp" value="0" min="0" max="999">
+              <div class="s-desc">0 = tidak diizinkan kirim foto</div>
+            </div>
+          </div>
+          <button class="save-btn" onclick="saveDefaults()"><i class="fa-solid fa-floppy-disk"></i> Simpan Default</button>
+        </div>
+      </div>
+
+    </div><!-- /page-settings -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+// ════════════════════════════════════════════════
+//  ▶ FIREBASE CONFIG — GANTI DENGAN MILIK KAMU
+// ════════════════════════════════════════════════
+const FB_CONFIG = {
+  apiKey:            "AIzaSyDC0DSJ88fhxIJDCyqxpX9goh4W1gX2fQQ",
+  authDomain:        "xrezzky-ai.firebaseapp.com",
+  databaseURL:       "https://xrezzky-ai-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "xrezzky-ai",
+  storageBucket:     "xrezzky-ai.firebasestorage.app",
+  messagingSenderId: "8326769744",
+  appId:             "1:8326769744:web:448856076321154986f555",
+  measurementId:     "G-N863EZJNMK",
+};
+// UID admin — setelah login pertama, buka Firebase Console > Authentication > copy UID kamu
+const ADMIN_UIDS = [
+  // "ISI_UID_KAMU_DI_SINI",
+];
+// ════════════════════════════════════════════════
+
+firebase.initializeApp(FB_CONFIG);
+const auth = firebase.auth();
+const db   = firebase.database();
+
+// ── STATE ────────────────────────────────────────
+let G = {
+  users:    {},   // users_config snapshot
+  traffic:  {},   // analytics/traffic snapshot
+  settings: {},   // system_settings snapshot
+  me:       null, // current firebase user
+};
+
+// ── PAGE META ────────────────────────────────────
+const PAGES = {
+  dashboard: { title:"Dashboard",        sub:"Ringkasan sistem XREZZKY AI" },
+  analytics:  { title:"Trafik & Analitik", sub:"Log kunjungan dan aktivitas user" },
+  users:      { title:"Manajemen User",   sub:"Kelola role, limit, ban, dan status user" },
+  settings:   { title:"Pengaturan Sistem",sub:"Konfigurasi global & batas kuota" },
+};
+
+// ════════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════════
+auth.onAuthStateChanged(async user => {
+  if (!user) { showGate(); return; }
+
+  // Cek admin
+  const isWhitelisted = ADMIN_UIDS.includes(user.uid);
+  let isAdminRole = false;
+  if (!isWhitelisted) {
+    try {
+      const s = await db.ref(`users_config/${user.uid}/role`).once("value");
+      isAdminRole = s.val() === "ADMIN";
+    } catch {}
+  }
+  if (!isWhitelisted && !isAdminRole) {
+    await auth.signOut();
+    showLoginErr("Akses ditolak. Akun ini bukan Admin XREZZKY.");
+    return;
+  }
+
+  G.me = user;
+  hideGate();
+  initApp();
+});
+
+function doLogin() {
+  const p = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(p).catch(e => showLoginErr("Gagal login: " + e.message));
+}
+function doLogout() {
+  confirm2("Logout?", "Kamu akan keluar dari dashboard.", "👋").then(ok => ok && auth.signOut());
+}
+function showGate() {
+  document.getElementById("loginGate").style.display = "flex";
+  document.getElementById("app").classList.remove("ready");
+}
+function hideGate() {
+  document.getElementById("loginGate").style.display = "none";
+  document.getElementById("app").classList.add("ready");
+}
+function showLoginErr(msg) {
+  const el = document.getElementById("loginErr");
+  el.textContent = msg; el.style.display = "block";
+}
+
+// ════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════
+function initApp() {
+  // Sidebar user info
+  const ava = document.getElementById("sbAva");
+  if (G.me.photoURL) ava.innerHTML = `<img src="${G.me.photoURL}">`;
+  else ava.textContent = (G.me.displayName?.[0] || "A").toUpperCase();
+  document.getElementById("sbName").textContent =
+    G.me.displayName || G.me.email?.split("@")[0] || "Admin";
+
+  // Nav
+  document.querySelectorAll(".nav-item[data-page]").forEach(el => {
+    el.addEventListener("click", () => switchPage(el.dataset.page));
+  });
+
+  // Role limits UI
+  renderRoleGrid();
+
+  // Realtime listeners
+  db.ref("users_config").on("value", snap => {
+    G.users = snap.val() || {};
+    refreshStats(); renderUsers(); renderTopUsers();
+  });
+  db.ref("analytics/traffic").on("value", snap => {
+    G.traffic = snap.val() || {};
+    refreshStats(); renderAnalytics(); renderTopUsers();
+  });
+  db.ref("system_settings").on("value", snap => {
+    G.settings = snap.val() || {};
+    refreshStats(); applySettingsUI();
+  });
+}
+
+// ════════════════════════════════════════════════
+//  PAGE SWITCH
+// ════════════════════════════════════════════════
+function switchPage(name) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".nav-item[data-page]").forEach(n => n.classList.remove("active"));
+  document.getElementById("page-" + name)?.classList.add("active");
+  document.querySelector(`.nav-item[data-page="${name}"]`)?.classList.add("active");
+  const m = PAGES[name] || { title: name, sub: "" };
+  document.getElementById("pgTitle").textContent = m.title;
+  document.getElementById("pgSub").textContent   = m.sub;
+}
+
+// ════════════════════════════════════════════════
+//  STATS
+// ════════════════════════════════════════════════
+function refreshStats() {
+  const uids = Object.keys(G.users);
+  let banned=0, stopped=0, totalChat=0, totalPhoto=0, today=0;
+  const cutoff = Date.now() - 86400000;
+
+  uids.forEach(uid => {
+    const r = G.users[uid]?.role || "GUEST";
+    if (r === "BANNED")   banned++;
+    if (r === "STOPPED")  stopped++;
+  });
+  Object.values(G.traffic).forEach(t => {
+    totalChat  += t.total_chats_sent  || 0;
+    totalPhoto += t.total_photos_sent || 0;
+    if ((t.last_visit || 0) >= cutoff) today++;
+  });
+
+  const gp  = G.settings.allow_guest_photos ?? false;
+  const roles = { ADMIN:0,SELLER:0,MEMBER:0,GUEST:0,BANNED:0,STOPPED:0 };
+  uids.forEach(uid => { const r=G.users[uid]?.role||"GUEST"; roles[r]=(roles[r]||0)+1; });
+
+  setText("s-users",       uids.length || "0");
+  setText("s-users-sub",   `A:${roles.ADMIN} S:${roles.SELLER} M:${roles.MEMBER} G:${roles.GUEST} B:${roles.BANNED}`);
+  setText("s-chats",       fmtN(totalChat));
+  setText("s-photos",      fmtN(totalPhoto));
+  setText("s-banned",      banned + stopped);
+  setText("s-today",       today);
+  setText("s-gphoto",      gp ? "Aktif" : "Nonaktif");
+  setText("s-gphoto-sub",  gp ? "Guest boleh kirim foto" : "Guest tidak boleh kirim foto");
+}
+
+// ════════════════════════════════════════════════
+//  TOP USERS
+// ════════════════════════════════════════════════
+function renderTopUsers() {
+  const tbody = document.getElementById("topTbl");
+  const rows  = Object.entries(G.traffic)
+    .map(([uid, t]) => ({ uid, ...t }))
+    .sort((a, b) => (b.total_chats_sent||0) - (a.total_chats_sent||0))
+    .slice(0, 5);
+
+  if (!rows.length) { tbody.innerHTML = emptyRow(7, "Belum ada data."); return; }
+
+  tbody.innerHTML = rows.map((t, i) => {
+    const u    = G.users[t.uid] || {};
+    const role = u.role || "GUEST";
+    const medal= ["🥇","🥈","🥉"][i] || (i+1);
+    return `<tr>
+      <td style="font-weight:700;color:var(--text-muted)">${medal}</td>
+      <td>${uCell(t.name||"Guest", t.email||"—", t.uid)}</td>
+      <td><span class="badge ${role}">${role}</span></td>
+      <td><strong style="color:var(--cyan)">${fmtN(t.total_chats_sent||0)}</strong></td>
+      <td>${fmtN(t.total_photos_sent||0)}</td>
+      <td style="color:var(--text-sub);font-size:11px">${fmtD(t.last_visit)}</td>
+      <td><button class="act pur" onclick="openUD('${t.uid}')"><i class="fa-solid fa-eye"></i></button></td>
+    </tr>`;
+  }).join("");
+}
+
+// ════════════════════════════════════════════════
+//  ANALYTICS TABLE
+// ════════════════════════════════════════════════
+function renderAnalytics() {
+  const q    = (document.getElementById("anSearch")?.value || "").toLowerCase();
+  const sort = document.getElementById("anSort")?.value || "total_chats_sent";
+
+  let rows = Object.entries(G.traffic).map(([uid,t]) => ({uid,...t}));
+  if (q) rows = rows.filter(t =>
+    (t.name||"").toLowerCase().includes(q) ||
+    (t.email||"").toLowerCase().includes(q) ||
+    (t.ip_address||"").includes(q)
+  );
+  rows.sort((a,b) => sort==="last_visit"
+    ? (b.last_visit||0)-(a.last_visit||0)
+    : (b[sort]||0)-(a[sort]||0)
+  );
+
+  setText("anCount", rows.length + " entri");
+  const tbody = document.getElementById("anTbl");
+  if (!rows.length) { tbody.innerHTML = emptyRow(7, "Tidak ada data."); return; }
+
+  tbody.innerHTML = rows.map(t => {
+    const u    = G.users[t.uid] || {};
+    const role = u.role || "GUEST";
+    return `<tr>
+      <td>${uCell(t.name||"Guest", t.email||t.uid, t.uid)}</td>
+      <td style="font-size:11px;color:var(--text-sub);white-space:nowrap">${fmtD(t.last_visit)}</td>
+      <td><strong style="color:var(--cyan)">${fmtN(t.total_chats_sent||0)}</strong></td>
+      <td>${fmtN(t.total_photos_sent||0)}</td>
+      <td><code style="font-size:10px;color:var(--text-muted)">${t.ip_address||"—"}</code></td>
+      <td><span class="badge ${role}">${role}</span></td>
+      <td>
+        <div class="act-grp">
+          <button class="act pur" onclick="openUD('${t.uid}')"><i class="fa-solid fa-eye"></i></button>
+          <button class="act cyn" onclick="doResetQuota('${t.uid}','${esc(t.name||"user")}')"><i class="fa-solid fa-rotate-right"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+// ════════════════════════════════════════════════
+//  USERS TABLE
+// ════════════════════════════════════════════════
+function renderUsers() {
+  const q    = (document.getElementById("usrSearch")?.value || "").toLowerCase();
+  const fr   = document.getElementById("usrRole")?.value || "";
+
+  let rows = Object.entries(G.users).map(([uid,u]) => ({uid,...u}));
+  if (q)  rows = rows.filter(u =>
+    (u.name||"").toLowerCase().includes(q) ||
+    (u.email||"").toLowerCase().includes(q) ||
+    u.uid.toLowerCase().includes(q)
+  );
+  if (fr) rows = rows.filter(u => (u.role||"GUEST") === fr);
+
+  setText("usrCount", rows.length + " user");
+  const tbody = document.getElementById("usrTbl");
+  if (!rows.length) { tbody.innerHTML = emptyRow(6,"Tidak ada user."); return; }
+
+  tbody.innerHTML = rows.map(u => {
+    const role    = u.role || "GUEST";
+    const tr      = G.traffic[u.uid] || {};
+    const name    = u.name  || tr.name  || "—";
+    const email   = u.email || tr.email || "—";
+    const isAdmin   = role === "ADMIN";
+    const isBanned  = role === "BANNED";
+    const isStopped = role === "STOPPED";
+
+    return `<tr id="row-${u.uid}">
+      <td>${uCell(name, email, u.uid)}</td>
+      <td>
+        <select class="tbl-select" id="r-${u.uid}" onchange="onRoleChg('${u.uid}')">
+          ${["ADMIN","SELLER","MEMBER","GUEST","BANNED","STOPPED"].map(r =>
+            `<option value="${r}"${r===role?" selected":""}>${r}</option>`
+          ).join("")}
+        </select>
+      </td>
+      <td>
+        <input type="number" class="tbl-inp" id="c-${u.uid}"
+          value="${isAdmin?"":u.max_chat_limit??50}"
+          placeholder="${isAdmin?"∞":""}"
+          ${isAdmin?"disabled":""} min="0" max="9999">
+      </td>
+      <td>
+        <input type="number" class="tbl-inp" id="p-${u.uid}"
+          value="${isAdmin?"":u.max_photo_limit??5}"
+          placeholder="${isAdmin?"∞":""}"
+          ${isAdmin?"disabled":""} min="0" max="9999">
+      </td>
+      <td>
+        <span class="badge ${isBanned?"BANNED":isStopped?"STOPPED":"MEMBER"}" id="st-${u.uid}">
+          ${isBanned?"BANNED":isStopped?"STOPPED":"AKTIF"}
+        </span>
+      </td>
+      <td>
+        <div class="act-grp">
+          <button class="act pri" onclick="doSave('${u.uid}','${esc(name)}')">
+            <i class="fa-solid fa-check"></i> Simpan
+          </button>
+          <button class="act pur" onclick="openUD('${u.uid}')">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+          <button class="act cyn" onclick="doResetQuota('${u.uid}','${esc(name)}')">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+          ${isBanned
+            ? `<button class="act grn" onclick="doUnban('${u.uid}','${esc(name)}')"><i class="fa-solid fa-unlock"></i></button>`
+            : `<button class="act red" onclick="doBan('${u.uid}','${esc(name)}')"><i class="fa-solid fa-ban"></i></button>`
+          }
+          ${isStopped
+            ? `<button class="act grn" onclick="doResume('${u.uid}','${esc(name)}')"><i class="fa-solid fa-play"></i></button>`
+            : (!isBanned ? `<button class="act yel" onclick="doStop('${u.uid}','${esc(name)}')"><i class="fa-solid fa-pause"></i></button>` : "")
+          }
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+function onRoleChg(uid) {
+  const role = document.getElementById(`r-${uid}`)?.value;
+  const ci   = document.getElementById(`c-${uid}`);
+  const pi   = document.getElementById(`p-${uid}`);
+  if (!ci || !pi) return;
+  if (role === "ADMIN") {
+    ci.value=""; ci.placeholder="∞"; ci.disabled=true;
+    pi.value=""; pi.placeholder="∞"; pi.disabled=true;
+  } else {
+    ci.disabled=false; pi.disabled=false;
+    const rl = (G.settings.role_limits||{})[role] || {};
+    if (!ci.value || ci.value==="∞") ci.value = rl.max_chat_limit  ?? defForRole(role,"chat");
+    if (!pi.value || pi.value==="∞") pi.value = rl.max_photo_limit ?? defForRole(role,"photo");
+  }
+}
+
+// ── CRUD ──────────────────────────────────────────
+async function doSave(uid, name) {
+  const role = document.getElementById(`r-${uid}`)?.value || "MEMBER";
+  const chat = role==="ADMIN" ? 9999 : parseInt(document.getElementById(`c-${uid}`)?.value)||0;
+  const photo= role==="ADMIN" ? 9999 : parseInt(document.getElementById(`p-${uid}`)?.value)||0;
+  try {
+    await db.ref(`users_config/${uid}`).update({ role, max_chat_limit:chat, max_photo_limit:photo });
+    toast(`${name} berhasil diupdate!`, "ok");
+  } catch(e) { toast("Gagal update: "+e.message, "err"); }
+}
+
+async function doBan(uid, name) {
+  const ok = await confirm2(`Ban <strong>${esc(name)}</strong>?`,
+    "User tidak bisa mengirim pesan setelah dibanned.", "🚫");
+  if (!ok) return;
+  try {
+    await db.ref(`users_config/${uid}`).update({ role:"BANNED" });
+    toast(`${name} dibanned.`, "ok");
+  } catch(e) { toast("Gagal ban: "+e.message, "err"); }
+}
+
+async function doUnban(uid, name) {
+  try {
+    await db.ref(`users_config/${uid}`).update({ role:"MEMBER" });
+    toast(`${name} diunban → MEMBER.`, "ok");
+  } catch(e) { toast("Gagal unban: "+e.message, "err"); }
+}
+
+async function doStop(uid, name) {
+  const ok = await confirm2(`Stop <strong>${esc(name)}</strong>?`,
+    "User tidak bisa chat sampai di-resume admin.", "⏸️");
+  if (!ok) return;
+  try {
+    await db.ref(`users_config/${uid}`).update({ role:"STOPPED" });
+    toast(`${name} dihentikan sementara.`, "inf");
+  } catch(e) { toast("Gagal stop: "+e.message, "err"); }
+}
+
+async function doResume(uid, name) {
+  try {
+    await db.ref(`users_config/${uid}`).update({ role:"MEMBER" });
+    toast(`${name} di-resume → MEMBER.`, "ok");
+  } catch(e) { toast("Gagal resume: "+e.message, "err"); }
+}
+
+async function doResetQuota(uid, name) {
+  if (!uid || uid === "—") return;
+  const ok = await confirm2(`Reset kuota <strong>${esc(name)}</strong>?`,
+    "Counter chat & foto harian user ini akan direset ke 0.", "🔄");
+  if (!ok) return;
+  try {
+    await db.ref(`daily_usage/${uid}`).remove();
+    toast(`Kuota ${name} direset!`, "ok");
+  } catch(e) { toast("Gagal reset: "+e.message, "err"); }
+}
+
+async function doResetAll() {
+  const ok = await confirm2("Reset Semua Kuota Harian?",
+    "Semua counter chat & foto seluruh user direset ke 0. Tidak bisa dibatalkan!", "⚠️");
+  if (!ok) return;
+  try {
+    await db.ref("daily_usage").remove();
+    toast("Semua kuota direset!", "ok");
+  } catch(e) { toast("Gagal reset global: "+e.message, "err"); }
+}
+
+// ════════════════════════════════════════════════
+//  SETTINGS
+// ════════════════════════════════════════════════
+function applySettingsUI() {
+  const s = G.settings;
+  setChk("tog-gphoto",   s.allow_guest_photos ?? false);
+  setChk("tog-maint",    s.maintenance_mode   ?? false);
+  setChk("tog-loginreq", s.login_required     ?? false);
+  setVal("def-mc", s.default_member_chat_limit  ?? 50);
+  setVal("def-mp", s.default_member_photo_limit ?? 5);
+  setVal("def-gc", s.default_guest_chat_limit   ?? 10);
+  setVal("def-gp", s.default_guest_photo_limit  ?? 0);
+  renderRoleGrid();
+}
+
+async function saveToggles() {
+  try {
+    await db.ref("system_settings").update({
+      allow_guest_photos: document.getElementById("tog-gphoto")?.checked  ?? false,
+      maintenance_mode:   document.getElementById("tog-maint")?.checked   ?? false,
+      login_required:     document.getElementById("tog-loginreq")?.checked ?? false,
+    });
+    toast("Toggle tersimpan!", "ok");
+  } catch(e) { toast("Gagal simpan: "+e.message, "err"); }
+}
+
+async function saveDefaults() {
+  try {
+    await db.ref("system_settings").update({
+      default_member_chat_limit:  parseInt(document.getElementById("def-mc")?.value) || 50,
+      default_member_photo_limit: parseInt(document.getElementById("def-mp")?.value) || 5,
+      default_guest_chat_limit:   parseInt(document.getElementById("def-gc")?.value) || 10,
+      default_guest_photo_limit:  parseInt(document.getElementById("def-gp")?.value) || 0,
+    });
+    toast("Default limit tersimpan!", "ok");
+  } catch(e) { toast("Gagal simpan: "+e.message, "err"); }
+}
+
+const ROLES_DEF = [
+  { role:"SELLER", icon:"fa-store",      color:"var(--cyan)"  },
+  { role:"MEMBER", icon:"fa-user-check", color:"var(--green)" },
+  { role:"GUEST",  icon:"fa-user",       color:"var(--text-sub)"},
+];
+
+function renderRoleGrid() {
+  const grid = document.getElementById("roleGrid");
+  if (!grid) return;
+  grid.innerHTML = ROLES_DEF.map(({ role, icon, color }) => {
+    const rl = (G.settings.role_limits||{})[role] || {};
+    return `
+    <div class="role-card">
+      <div class="role-card-head">
+        <i class="fa-solid ${icon}" style="color:${color}"></i>
+        <span class="badge ${role}">${role}</span>
+      </div>
+      <div class="rlc-row">
+        <span class="rlc-lbl">Max Chat/hari</span>
+        <input type="number" class="rlc-inp" id="rl-c-${role}"
+          value="${rl.max_chat_limit ?? defForRole(role,'chat')}" min="0" max="9999">
+      </div>
+      <div class="rlc-row">
+        <span class="rlc-lbl">Max Foto/hari</span>
+        <input type="number" class="rlc-inp" id="rl-p-${role}"
+          value="${rl.max_photo_limit ?? defForRole(role,'photo')}" min="0" max="9999">
+      </div>
+      <div class="rlc-note">berlaku untuk user baru dengan role ini</div>
+    </div>`;
+  }).join("");
+}
+
+async function saveRoleLimits() {
+  const updates = {};
+  ROLES_DEF.forEach(({ role }) => {
+    updates[`role_limits/${role}`] = {
+      max_chat_limit:  parseInt(document.getElementById(`rl-c-${role}`)?.value) || 0,
+      max_photo_limit: parseInt(document.getElementById(`rl-p-${role}`)?.value) || 0,
+    };
+  });
+  try {
+    await db.ref("system_settings").update(updates);
+    toast("Limit per role tersimpan!", "ok");
+  } catch(e) { toast("Gagal simpan: "+e.message, "err"); }
+}
+
+function defForRole(role, type) {
+  const m = { SELLER:{chat:200,photo:50}, MEMBER:{chat:50,photo:5}, GUEST:{chat:10,photo:0} };
+  return m[role]?.[type] ?? 0;
+}
+
+// ════════════════════════════════════════════════
+//  USER DETAIL MODAL
+// ════════════════════════════════════════════════
+async function openUD(uid) {
+  const u = G.users[uid]   || {};
+  const t = G.traffic[uid] || {};
+  const name  = u.name  || t.name  || "—";
+  const email = u.email || t.email || "—";
+  const role  = u.role  || "GUEST";
+
+  // Fill header
+  document.getElementById("ud-ava").textContent   = (name[0]||"?").toUpperCase();
+  document.getElementById("ud-name").textContent  = name;
+  document.getElementById("ud-email").textContent = email;
+  document.getElementById("ud-uid").textContent   = uid;
+  const rb = document.getElementById("ud-role");
+  rb.className = "badge " + role; rb.textContent = role;
+
+  // Fill fields
+  document.getElementById("ud-ip").textContent    = t.ip_address || "—";
+  document.getElementById("ud-chats").textContent = fmtN(t.total_chats_sent  || 0);
+  document.getElementById("ud-photos").textContent= fmtN(t.total_photos_sent || 0);
+  document.getElementById("ud-last").textContent  = fmtD(t.last_visit);
+  document.getElementById("ud-since").textContent = fmtD(u.created_at || t.first_visit);
+  document.getElementById("ud-clim").textContent  = role==="ADMIN" ? "∞" : (u.max_chat_limit ?? "—");
+
+  // Open
+  document.getElementById("udModal").classList.add("open");
+  document.body.style.overflow = "hidden";
+
+  // Load chart & sessions async
+  loadUDChart(uid);
+  loadUDSessions(uid);
+}
+
+function closeUD() {
+  document.getElementById("udModal").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+async function loadUDChart(uid) {
+  const container = document.getElementById("ud-chart");
+  container.innerHTML = `<div class="spinner"></div>`;
+  try {
+    const snap = await db.ref(`daily_usage/${uid}`).once("value");
+    const data = snap.val() || {};
+    const days = Object.keys(data).sort().slice(-7);
+    if (!days.length) {
+      container.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center">Belum ada data aktivitas.</div>`;
+      return;
+    }
+    const maxV = Math.max(...days.map(d => data[d].chats || 0), 1);
+    container.innerHTML = `
+      <div style="display:flex;align-items:flex-end;gap:5px;height:72px;padding:4px 0">
+        ${days.map(d => {
+          const c = data[d].chats  || 0;
+          const p = data[d].photos || 0;
+          const h = Math.max((c/maxV)*100, 5);
+          const ph= p > 0 ? Math.min((p/Math.max(c,1))*100, 100) : 0;
+          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%">
+            <div style="flex:1;display:flex;align-items:flex-end;width:100%">
+              <div style="width:100%;height:${h}%;background:var(--accent);border-radius:3px 3px 0 0;opacity:.8;position:relative" title="Chat:${c} Foto:${p}">
+                ${ph>0?`<div style="position:absolute;bottom:0;left:0;right:0;height:${ph}%;background:var(--cyan);border-radius:inherit;opacity:.8"></div>`:""}
+              </div>
+            </div>
+            <div style="font-size:8px;color:var(--text-muted)">${d.slice(5)}</div>
+            <div style="font-size:9px;color:var(--cyan);font-weight:700">${c}</div>
+          </div>`;
+        }).join("")}
+      </div>
+      <div style="display:flex;gap:12px;margin-top:7px">
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-sub)">
+          <div style="width:9px;height:9px;background:var(--accent);border-radius:2px;opacity:.8"></div> Chat
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-sub)">
+          <div style="width:9px;height:9px;background:var(--cyan);border-radius:2px;opacity:.8"></div> Foto
+        </div>
+      </div>`;
+  } catch {
+    container.innerHTML = `<div style="color:var(--red);font-size:12px;text-align:center">Gagal memuat data.</div>`;
+  }
+}
+
+async function loadUDSessions(uid) {
+  const container = document.getElementById("ud-sessions");
+  container.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:6px">Memuat sesi...</div>`;
+  try {
+    const snap = await db.ref(`user_sessions/${uid}`).limitToLast(5).once("value");
+    const list = [];
+    snap.forEach(child => {
+      const meta  = child.val()?.meta || {};
+      const chats = child.val()?.chats ? Object.keys(child.val().chats).length : 0;
+      list.push({ id:child.key, title:meta.title||"Obrolan", last:meta.last_active||meta.created_at||0, chats });
+    });
+    list.sort((a,b) => b.last - a.last);
+    if (!list.length) {
+      container.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:6px">Belum ada sesi.</div>`;
+      return;
+    }
+    container.innerHTML = list.map(s => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 11px;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:7px">
+        <div>
+          <div style="font-size:12px;font-weight:600">${esc(s.title)}</div>
+          <div style="font-size:10px;color:var(--text-muted)">${fmtD(s.last)} · ${s.chats} pesan</div>
+        </div>
+        <code style="font-size:9px;color:var(--text-muted)">${s.id.slice(0,12)}…</code>
+      </div>`).join("");
+  } catch {
+    container.innerHTML = `<div style="color:var(--red);font-size:12px;text-align:center;padding:6px">Gagal memuat.</div>`;
+  }
+}
+
+// ════════════════════════════════════════════════
+//  EXPORT CSV
+// ════════════════════════════════════════════════
+function exportCSV(type) {
+  let rows, fname;
+  if (type === "users") {
+    rows = [["UID","Nama","Email","Role","Max Chat","Max Foto"]];
+    Object.entries(G.users).forEach(([uid,u]) => {
+      const t = G.traffic[uid] || {};
+      rows.push([uid, u.name||t.name||"—", u.email||t.email||"—",
+        u.role||"GUEST", u.max_chat_limit||0, u.max_photo_limit||0]);
+    });
+    fname = `xrezzky_users_${dateStr()}.csv`;
+  } else {
+    rows = [["UID","Nama","Email","Total Chat","Total Foto","IP","Terakhir Kunjungan"]];
+    Object.entries(G.traffic).forEach(([uid,t]) => {
+      rows.push([uid, t.name||"—", t.email||"—",
+        t.total_chats_sent||0, t.total_photos_sent||0,
+        t.ip_address||"—", fmtD(t.last_visit)]);
+    });
+    fname = `xrezzky_traffic_${dateStr()}.csv`;
+  }
+  const csv  = rows.map(r => r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob(["\uFEFF"+csv], {type:"text/csv;charset=utf-8;"});
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement("a"), {href:url, download:fname});
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  toast(fname + " didownload!", "ok");
+}
+
+// ════════════════════════════════════════════════
+//  CONFIRM DIALOG
+// ════════════════════════════════════════════════
+function confirm2(title, msg, icon="⚠️") {
+  return new Promise(resolve => {
+    const el = document.getElementById("cfm");
+    document.getElementById("cfmIcon").textContent  = icon;
+    document.getElementById("cfmTitle").innerHTML   = title;
+    document.getElementById("cfmMsg").textContent   = msg;
+    el.classList.add("open");
+
+    const ok  = document.getElementById("cfmOk");
+    const no  = document.getElementById("cfmNo");
+    const done = (v) => {
+      el.classList.remove("open");
+      ok.replaceWith(ok.cloneNode(true));
+      no.replaceWith(no.cloneNode(true));
+      resolve(v);
+    };
+    document.getElementById("cfmOk").addEventListener("click", () => done(true),  {once:true});
+    document.getElementById("cfmNo").addEventListener("click",  () => done(false), {once:true});
+  });
+}
+
+// ════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════
+function toast(msg, type="inf") {
+  const wrap = document.getElementById("toasts");
+  const el   = document.createElement("div");
+  const ic   = {ok:"fa-circle-check",err:"fa-circle-xmark",inf:"fa-circle-info"}[type]||"fa-info";
+  el.className = `toast ${type}`;
+  el.innerHTML = `<i class="fa-solid ${ic}"></i> ${msg}`;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ════════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════════
+function setText(id, v) { const e=document.getElementById(id); if(e) e.textContent=v; }
+function setVal(id, v)  { const e=document.getElementById(id); if(e) e.value=v; }
+function setChk(id, v)  { const e=document.getElementById(id); if(e) e.checked=v; }
+function fmtN(n)        { return n>=1000?(n/1000).toFixed(1)+"k":String(n); }
+function fmtD(ts)       { if(!ts) return "—"; return new Date(ts).toLocaleString("id-ID",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}); }
+function esc(s)         { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/'/g,"&#39;"); }
+function dateStr()      { return new Date().toISOString().slice(0,10); }
+function emptyRow(cols, msg) { return `<tr><td colspan="${cols}" class="tbl-empty">${msg}</td></tr>`; }
+function uCell(name, email, uid) {
+  const COLORS = ["#2563eb","#7c3aed","#0891b2","#059669","#d97706","#db2777"];
+  const idx    = (uid||name||"").split("").reduce((a,c)=>a+c.charCodeAt(0),0) % COLORS.length;
+  return `<div class="u-cell">
+    <div class="u-ava" style="background:${COLORS[idx]}">${(name[0]||"?").toUpperCase()}</div>
+    <div>
+      <div class="u-name">${esc(name)}</div>
+      <div class="u-email">${esc(email)}</div>
+    </div>
+  </div>`;
+}
+</script>
+</body>
+</html>
